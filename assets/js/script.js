@@ -16,7 +16,9 @@ $(document).ready(function() {
     searchBtn.on("click", function(){
 
         $.get(`${weatherURL}&q=${city.val()},${state.val()},us`).then((response) => {
+
             console.log(response);
+            $(".weather-reuslts").empty();
             $(".city-name").text(response.name);
             $("p.current-temp").text(`Temperature: ${response.main.temp} F`);
             $("p.current-humidity").text(`Humidity: ${response.main.humidity}%`);
@@ -25,9 +27,11 @@ $(document).ready(function() {
         });
 
         $.get(`${forecastURL}&q=${city.val()},${state.val()},us`).then((response) => {
+            
             console.log(response);
             let e = 4;
             for (let i = 0; i < forecastDays.length; i++) {
+                forecastDays[i].empty();
                 let element = forecastDays[i];
                 let newTemp = $("<p>");
                 let newHumid = $("<p>");
@@ -35,7 +39,7 @@ $(document).ready(function() {
                 newHumid.text(`Humidity: ${response.list[e].main.humidity}%`);
                 element.append(newTemp).append(newHumid);
                 e+=8;
-            }
+            };
         });           
     });
 })
