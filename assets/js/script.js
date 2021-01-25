@@ -2,8 +2,8 @@ $(document).ready(function() {
 
     const _this = $(this);
     const searchBtn = $(".search-btn");
-    let weatherURL = "http://api.openweathermap.org/data/2.5/weather?appid=fab861540adeaacaf58d87add689e290&units=imperial"
-    let forecastURL = "http://api.openweathermap.org/data/2.5/forecast?appid=fab861540adeaacaf58d87add689e290&units=imperial"
+    let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=fab861540adeaacaf58d87add689e290&units=imperial"
+    let forecastURL = "https://api.openweathermap.org/data/2.5/forecast?appid=fab861540adeaacaf58d87add689e290&units=imperial"
     let city = $(".city");
     let state = $(".state");
     let forecastDays = [
