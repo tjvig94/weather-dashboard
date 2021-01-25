@@ -54,41 +54,42 @@ $(document).ready(function() {
     init();
 
     function getWeather() {
-        $.get(`${weatherURL}&q=${city.val()},${state.val()},us`).then((response) => {
+        if (city.val() !== "") {
+            $.get(`${weatherURL}&q=${city.val()},${state.val()},us`).then((response) => {
 
-            console.log(response);
-            $(".city-name").text(response.name);
-            $("p.current-temp").text(`Temperature: ${response.main.temp} F`);
-            $("p.current-humidity").text(`Humidity: ${response.main.humidity}%`);
-            $("p.current-wind").text(`Wind Speed: ${response.wind.speed} mph`);
-            $("p.current-uv").text(`UV Index: `);
-        });
+                console.log(response);
+                $(".city-name").text(response.name);
+                $("p.current-temp").text(`Temperature: ${response.main.temp} F`);
+                $("p.current-humidity").text(`Humidity: ${response.main.humidity}%`);
+                $("p.current-wind").text(`Wind Speed: ${response.wind.speed} mph`);
+                $("p.current-uv").text(`UV Index: `);
+            });
 
-        $.get(`${forecastURL}&q=${city.val()},${state.val()},us`).then((response) => {            
-            console.log(response);
-            let e = 4;
-            for (let i = 0; i < forecastDays.length; i++) {
-                forecastDays[i].empty();
-                let element = forecastDays[i];
-                let newTemp = $("<p>");
-                let newHumid = $("<p>");
-                newTemp.text(`Temp: ${response.list[e].main.temp} F`);
-                newHumid.text(`Humidity: ${response.list[e].main.humidity}%`);
-                element.append(newTemp).append(newHumid);
-                e+=8;
-            };
-            
-            if (cityHistory.includes(city.val())) {
-                return;
-            } else {
-                let cityBtn = $("<li class='list-group-item'>");            
-                cityBtn.text(city.val());
-                $("ul").prepend(cityBtn);
-                cityHistory.push(city.val());
-                localStorage.setItem("Cities", JSON.stringify(cityHistory));
-            }            
-        });
+            $.get(`${forecastURL}&q=${city.val()},${state.val()},us`).then((response) => {            
+                console.log(response);
+                let e = 4;
+                for (let i = 0; i < forecastDays.length; i++) {
+                    forecastDays[i].empty();
+                    let element = forecastDays[i];
+                    let newTemp = $("<p>");
+                    let newHumid = $("<p>");
+                    newTemp.text(`Temp: ${response.list[e].main.temp} F`);
+                    newHumid.text(`Humidity: ${response.list[e].main.humidity}%`);
+                    element.append(newTemp).append(newHumid);
+                    e+=8;
+                };
+                
+                if (cityHistory.includes(city.val())) {
+                    return;
+                } else {
+                    let cityBtn = $("<li class='list-group-item'>");            
+                    cityBtn.text(city.val());
+                    $("ul").prepend(cityBtn);
+                    cityHistory.push(city.val());
+                    localStorage.setItem("Cities", JSON.stringify(cityHistory));
+                }            
+            });
+        };
     };
-    
     searchBtn.on("click", getWeather);
 })
