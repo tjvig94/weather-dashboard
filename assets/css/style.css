@@ -2,3 +2,12 @@ header {
     background-color: #79a3b1;
     color: #fcf8ec;
 }
+
+li.list-group-item:hover {
+    cursor: pointer;
+    background-color:#79a3b1;
+}
+
+li.list-group-item:active {
+    background-color:antiquewhite;
+}

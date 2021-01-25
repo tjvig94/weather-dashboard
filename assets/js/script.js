@@ -8,13 +8,29 @@ $(document).ready(function() {
     let state = $(".state");
     let forecastDays = [
         $("div.day1"), $("div.day2"), $("div.day3"),  $("div.day4"), $("div.day5")
-    ]   
+    ]
 
+    let cityHistory = JSON.parse(localStorage.getItem("Cities"));    
 
+    function listCities() {
+        (cityHistory == null) ? cityHistory = [] : "";
+        cityHistory.forEach(element => {
+            let cityBtn = $("<li class='list-group-item'>");
+            cityBtn.text(element);
+            $("ul").prepend(cityBtn);
+        });
+    };
     
-    
-    searchBtn.on("click", function(){
+    listCities();
 
+    function init() {
+        let recentCity = cityHistory[cityHistory.length-1];
+        
+    }
+
+    init();
+
+    function getWeather() {
         $.get(`${weatherURL}&q=${city.val()},${state.val()},us`).then((response) => {
 
             console.log(response);
@@ -26,8 +42,7 @@ $(document).ready(function() {
             $("p.current-uv").text(`UV Index: `);
         });
 
-        $.get(`${forecastURL}&q=${city.val()},${state.val()},us`).then((response) => {
-            
+        $.get(`${forecastURL}&q=${city.val()},${state.val()},us`).then((response) => {            
             console.log(response);
             let e = 4;
             for (let i = 0; i < forecastDays.length; i++) {
@@ -40,6 +55,18 @@ $(document).ready(function() {
                 element.append(newTemp).append(newHumid);
                 e+=8;
             };
-        });           
-    });
+            
+            if (cityHistory.includes(city.val())) {
+                return;
+            } else {
+                let cityBtn = $("<li class='list-group-item'>");            
+                cityBtn.text(city.val());
+                $("ul").prepend(cityBtn);
+                cityHistory.push(city.val());
+                localStorage.setItem("Cities", JSON.stringify(cityHistory));
+            }            
+        });
+    };
+    
+    searchBtn.on("click", getWeather);
 })
