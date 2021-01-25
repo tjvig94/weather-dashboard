@@ -22,33 +22,33 @@ $(document).ready(function() {
     };
 
     function init() {
-        let recentCity = cityHistory[cityHistory.length-1];
-        $.get(`${weatherURL}&q=${recentCity},${state.val()},us`).then((response) => {
+        if (cityHistory !== null) {
+            let recentCity = cityHistory[cityHistory.length-1];
+            $.get(`${weatherURL}&q=${recentCity},${state.val()},us`).then((response) => {
 
-            console.log(response);
-            $(".city-name").text(response.name);
-            $("p.current-temp").text(`Temperature: ${response.main.temp} F`);
-            $("p.current-humidity").text(`Humidity: ${response.main.humidity}%`);
-            $("p.current-wind").text(`Wind Speed: ${response.wind.speed} mph`);
-            $("p.current-uv").text(`UV Index: `);
-        });
-        $.get(`${forecastURL}&q=${city.val()},${state.val()},us`).then((response) => {            
-            console.log(response);
-            let e = 4;
-            for (let i = 0; i < forecastDays.length; i++) {
-                forecastDays[i].empty();
-                let element = forecastDays[i];
-                let newTemp = $("<p>");
-                let newHumid = $("<p>");
-                newTemp.text(`Temp: ${response.list[e].main.temp} F`);
-                newHumid.text(`Humidity: ${response.list[e].main.humidity}%`);
-                element.append(newTemp).append(newHumid);
-                e+=8;
-            };
-        });
-        
+                console.log(response);
+                $(".city-name").text(response.name);
+                $("p.current-temp").text(`Temperature: ${response.main.temp} F`);
+                $("p.current-humidity").text(`Humidity: ${response.main.humidity}%`);
+                $("p.current-wind").text(`Wind Speed: ${response.wind.speed} mph`);
+                $("p.current-uv").text(`UV Index: `);
+            });
+            $.get(`${forecastURL}&q=${city.val()},${state.val()},us`).then((response) => {            
+                console.log(response);
+                let e = 4;
+                for (let i = 0; i < forecastDays.length; i++) {
+                    forecastDays[i].empty();
+                    let element = forecastDays[i];
+                    let newTemp = $("<p>");
+                    let newHumid = $("<p>");
+                    newTemp.text(`Temp: ${response.list[e].main.temp} F`);
+                    newHumid.text(`Humidity: ${response.list[e].main.humidity}%`);
+                    element.append(newTemp).append(newHumid);
+                    e+=8;
+                };
+            });    
+        }; 
         listCities();
-        
     }
 
     init();
