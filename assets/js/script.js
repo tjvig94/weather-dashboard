@@ -7,7 +7,7 @@ $(document).ready(function() {
     let city = $(".city");
     let state = $(".state");
     let forecastDays = [
-        $("div.day1"), $("div.day2"), $("div.day3"),  $("div.day4"), $("div.day5")
+        $(".day1"), $(".day2"), $(".day3"),  $(".day4"), $(".day5")
     ]
 
     let cityHistory = JSON.parse(localStorage.getItem("Cities"));    
@@ -26,6 +26,11 @@ $(document).ready(function() {
             let recentCity = cityHistory[cityHistory.length-1];
             $.get(`${weatherURL}&q=${recentCity},${state.val()},us`).then((response) => {
 
+                let icon = "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png";
+                let img = $("<img>");
+                img.attr("src", icon);
+                $(".weather-results").prepend(img);
+
                 console.log(response);
                 $(".city-name").text(response.name);
                 $("p.current-temp").text(`Temperature: ${response.main.temp} F`);
@@ -37,8 +42,14 @@ $(document).ready(function() {
                 console.log(response);
                 let e = 4;
                 for (let i = 0; i < forecastDays.length; i++) {
-                    forecastDays[i].empty();
                     let element = forecastDays[i];
+                    element.empty();
+
+                    let icon = "https://openweathermap.org/img/w/" + response.list[e].weather[0].icon + ".png";
+                    let img = $("<img>");
+                    img.attr("src", icon);
+                    element.prepend(img);
+                    
                     let newTemp = $("<p>");
                     let newHumid = $("<p>");
                     newTemp.text(`Temp: ${response.list[e].main.temp} F`);
@@ -56,8 +67,14 @@ $(document).ready(function() {
     function getWeather() {
         if (city.val() !== "") {
             $.get(`${weatherURL}&q=${city.val()},${state.val()},us`).then((response) => {
-
+                
                 console.log(response);
+
+                let icon = "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png";
+                let img = $("<img>");
+                img.attr("src", icon);
+                $(".weather-results").prepend(img);
+
                 $(".city-name").text(response.name);
                 $("p.current-temp").text(`Temperature: ${response.main.temp} F`);
                 $("p.current-humidity").text(`Humidity: ${response.main.humidity}%`);
@@ -69,12 +86,18 @@ $(document).ready(function() {
                 console.log(response);
                 let e = 4;
                 for (let i = 0; i < forecastDays.length; i++) {
-                    forecastDays[i].empty();
                     let element = forecastDays[i];
+                    element.empty();
+
+                    let icon = "https://openweathermap.org/img/w/" + response.list[e].weather[0].icon + ".png";
+                    let img = $("<img>");
+                    
                     let newTemp = $("<p>");
                     let newHumid = $("<p>");
                     newTemp.text(`Temp: ${response.list[e].main.temp} F`);
                     newHumid.text(`Humidity: ${response.list[e].main.humidity}%`);
+                    element.prepend(img);
+                    img.attr("src", icon);
                     element.append(newTemp).append(newHumid);
                     e+=8;
                 };
