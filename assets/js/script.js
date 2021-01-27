@@ -1,22 +1,23 @@
 $(document).ready(function() {
 
-    const _this = $(this);
     const searchBtn = $(".search-btn");
-    let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=fab861540adeaacaf58d87add689e290&units=imperial"
-    let forecastURL = "https://api.openweathermap.org/data/2.5/forecast?appid=fab861540adeaacaf58d87add689e290&units=imperial"
     let city = $(".city");
     let state = $(".state");
+    let weatherURL = "https://api.openweathermap.org/data/2.5/onecall?appid=fab861540adeaacaf58d87add689e290&units=imperial&exclude=minutely,hourly,alerts"
+    let geoCode = `http://api.openweathermap.org/geo/1.0/direct?appid=fab861540adeaacaf58d87add689e290&limit=1`
     let forecastDays = [
         $(".day1"), $(".day2"), $(".day3"),  $(".day4"), $(".day5")
     ]
 
-    let cityHistory = JSON.parse(localStorage.getItem("Cities"));    
+    let cityHistory = JSON.parse(localStorage.getItem("cities"));
 
     function listCities() {
         (cityHistory == null) ? cityHistory = [] : "";
         cityHistory.forEach(element => {
             let cityBtn = $("<li class='list-group-item'>");
-            cityBtn.text(element);
+            cityBtn.text(`${element.name}, ${element.state}`);
+            cityBtn.attr("data-name", `${element.name}`);
+            cityBtn.attr("data-state", `${element.state}`);
             $("ul").prepend(cityBtn);
         });
     };
@@ -24,40 +25,39 @@ $(document).ready(function() {
     function init() {
         if (cityHistory !== null) {
             let recentCity = cityHistory[cityHistory.length-1];
-            $.get(`${weatherURL}&q=${recentCity},${state.val()},us`).then((response) => {
+            console.log(recentCity);
+            $.get(`${geoCode}&q=${recentCity.name},${recentCity.state},us`).then((response) => {
+                let lat = response[0].lat;
+                let lon = response[0].lon;
+                $(".city-name").text(response[0].name);
 
-                let icon = "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png";
-                let img = $("<img>");
-                img.attr("src", icon);
-                $(".weather-results").prepend(img);
+                // use lat and lon values to search for that location's weather data
+                $.get(`${weatherURL}&lat=${lat}&lon=${lon}`).then((response) => {
+                    // Current conditions
+                    $("p.current-temp").text(`Temperature: ${response.current.temp} F`);
+                    $("p.current-humidity").text(`Humidity: ${response.current.humidity}%`);
+                    $("p.current-wind").text(`Wind Speed: ${response.current.wind_speed} mph`);
+                    $("p.current-uv").text(`UV Index: ${response.current.uvi}`);
+                    // Prepend icon for current conditons
+                    let currentIcon = "https://openweathermap.org/img/w/" + response.current.weather[0].icon + ".png";
+                    $("img.current-icon").attr("src", currentIcon);
 
-                console.log(response);
-                $(".city-name").text(response.name);
-                $("p.current-temp").text(`Temperature: ${response.main.temp} F`);
-                $("p.current-humidity").text(`Humidity: ${response.main.humidity}%`);
-                $("p.current-wind").text(`Wind Speed: ${response.wind.speed} mph`);
-                $("p.current-uv").text(`UV Index: `);
-            });
-            $.get(`${forecastURL}&q=${city.val()},${state.val()},us`).then((response) => {            
-                console.log(response);
-                let e = 4;
-                for (let i = 0; i < forecastDays.length; i++) {
-                    let element = forecastDays[i];
-                    element.empty();
-
-                    let icon = "https://openweathermap.org/img/w/" + response.list[e].weather[0].icon + ".png";
-                    let img = $("<img>");
-                    img.attr("src", icon);
-                    element.prepend(img);
-                    
-                    let newTemp = $("<p>");
-                    let newHumid = $("<p>");
-                    newTemp.text(`Temp: ${response.list[e].main.temp} F`);
-                    newHumid.text(`Humidity: ${response.list[e].main.humidity}%`);
-                    element.append(newTemp).append(newHumid);
-                    e+=8;
-                };
-            });    
+                    // 5 Day Forecast
+                    for (let i = 0; i < forecastDays.length; i++) {
+                        let element = forecastDays[i];
+                            element.empty();       
+                            let icon = "https://openweathermap.org/img/w/" + response.daily[i].weather[0].icon + ".png";
+                            let img = $("<img>");                            
+                            let newTemp = $("<p>");
+                            let newHumid = $("<p>");
+                            newTemp.text(`Temp: ${response.daily[i].temp.day} F`);
+                            newHumid.text(`Humidity: ${response.daily[i].humidity} %`);
+                            element.prepend(img);
+                            img.attr("src", icon);
+                            element.append(newTemp).append(newHumid); 
+                    };
+                });
+            });            
         }; 
         listCities();
     }
@@ -66,53 +66,91 @@ $(document).ready(function() {
 
     function getWeather() {
         if (city.val() !== "") {
-            $.get(`${weatherURL}&q=${city.val()},${state.val()},us`).then((response) => {
-                
+            // Get latitude and longitude values for API weather query
+            $.get(`${geoCode}&q=${city.val()},${state.val()},us`).then((response) => {
                 console.log(response);
+                let lat = response[0].lat;
+                let lon = response[0].lon;
+                let name = response[0].name;
+                let state = response[0].state;
+                $(".city-name").text(response[0].name);
 
-                let icon = "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png";
-                let img = $("<img>");
-                img.attr("src", icon);
-                $(".weather-results").prepend(img);
-
-                $(".city-name").text(response.name);
-                $("p.current-temp").text(`Temperature: ${response.main.temp} F`);
-                $("p.current-humidity").text(`Humidity: ${response.main.humidity}%`);
-                $("p.current-wind").text(`Wind Speed: ${response.wind.speed} mph`);
-                $("p.current-uv").text(`UV Index: `);
-            });
-
-            $.get(`${forecastURL}&q=${city.val()},${state.val()},us`).then((response) => {            
-                console.log(response);
-                let e = 4;
-                for (let i = 0; i < forecastDays.length; i++) {
-                    let element = forecastDays[i];
-                    element.empty();
-
-                    let icon = "https://openweathermap.org/img/w/" + response.list[e].weather[0].icon + ".png";
-                    let img = $("<img>");
-                    
-                    let newTemp = $("<p>");
-                    let newHumid = $("<p>");
-                    newTemp.text(`Temp: ${response.list[e].main.temp} F`);
-                    newHumid.text(`Humidity: ${response.list[e].main.humidity}%`);
-                    element.prepend(img);
-                    img.attr("src", icon);
-                    element.append(newTemp).append(newHumid);
-                    e+=8;
+                let newCity = {
+                    "name": name,
+                    "state": state,
+                    "lat": lat,
+                    "lon": lon
                 };
-                
-                if (cityHistory.includes(city.val())) {
-                    return;
-                } else {
-                    let cityBtn = $("<li class='list-group-item'>");            
-                    cityBtn.text(city.val());
-                    $("ul").prepend(cityBtn);
-                    cityHistory.push(city.val());
-                    localStorage.setItem("Cities", JSON.stringify(cityHistory));
-                }            
+
+                (cityHistory == null) ? cityHistory = [] : "";
+                cityHistory.push(newCity);
+                localStorage.setItem("cities", JSON.stringify(cityHistory));
+
+                // use lat and lon values to search for that location's weather data
+                $.get(`${weatherURL}&lat=${lat}&lon=${lon}`).then((response) => {
+                    console.log(response);
+
+                    // Current conditions
+                    $("p.current-temp").text(`Temperature: ${response.current.temp} F`);
+                    $("p.current-humidity").text(`Humidity: ${response.current.humidity}%`);
+                    $("p.current-wind").text(`Wind Speed: ${response.current.wind_speed} mph`);
+                    $("p.current-uv").text(`UV Index: ${response.current.uvi}`);
+                    // Prepend icon for current conditons
+                    let currentIcon = "https://openweathermap.org/img/w/" + response.current.weather[0].icon + ".png";
+                    $(".current-icon").attr("src", currentIcon);
+
+                    // 5 Day Forecast
+                    for (let i = 0; i < forecastDays.length; i++) {
+                        let element = forecastDays[i];
+                            element.empty();       
+                            let icon = "https://openweathermap.org/img/w/" + response.daily[i].weather[0].icon + ".png";
+                            let img = $("<img>");                            
+                            let newTemp = $("<p>");
+                            let newHumid = $("<p>");
+                            newTemp.text(`Temp: ${response.daily[i].temp.day} F`);
+                            newHumid.text(`Humidity: ${response.daily[i].humidity} %`);
+                            element.prepend(img);
+                            img.attr("src", icon);
+                            element.append(newTemp).append(newHumid); 
+                    };
+                });
             });
         };
     };
     searchBtn.on("click", getWeather);
+    $("li").on("click", function() {
+        let _this = $(this);
+        $.get(`${geoCode}&q=${_this.data("name")},${_this.data("state")},us`).then((response) => {
+            let lat = response[0].lat;
+            let lon = response[0].lon;
+            $(".city-name").text(response[0].name);
+
+            // use lat and lon values to search for that location's weather data
+            $.get(`${weatherURL}&lat=${lat}&lon=${lon}`).then((response) => {
+                // Current conditions
+                $("p.current-temp").text(`Temperature: ${response.current.temp} F`);
+                $("p.current-humidity").text(`Humidity: ${response.current.humidity}%`);
+                $("p.current-wind").text(`Wind Speed: ${response.current.wind_speed} mph`);
+                $("p.current-uv").text(`UV Index: ${response.current.uvi}`);
+                // Prepend icon for current conditons
+                let currentIcon = "https://openweathermap.org/img/w/" + response.current.weather[0].icon + ".png";
+                $("img.current-icon").attr("src", currentIcon);
+
+                // 5 Day Forecast
+                for (let i = 0; i < forecastDays.length; i++) {
+                    let element = forecastDays[i];
+                        element.empty();       
+                        let icon = "https://openweathermap.org/img/w/" + response.daily[i].weather[0].icon + ".png";
+                        let img = $("<img>");                            
+                        let newTemp = $("<p>");
+                        let newHumid = $("<p>");
+                        newTemp.text(`Temp: ${response.daily[i].temp.day} F`);
+                        newHumid.text(`Humidity: ${response.daily[i].humidity} %`);
+                        element.prepend(img);
+                        img.attr("src", icon);
+                        element.append(newTemp).append(newHumid); 
+                };
+            });
+        });       
+    });
 })
