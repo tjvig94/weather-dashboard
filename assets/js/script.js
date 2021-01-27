@@ -46,12 +46,12 @@ $(document).ready(function() {
                     for (let i = 0; i < forecastDays.length; i++) {
                         let element = forecastDays[i];
                             element.empty();       
-                            let icon = "https://openweathermap.org/img/w/" + response.daily[i].weather[0].icon + ".png";
+                            let icon = "https://openweathermap.org/img/w/" + response.daily[i+1].weather[0].icon + ".png";
                             let img = $("<img>");                            
                             let newTemp = $("<p>");
                             let newHumid = $("<p>");
-                            newTemp.text(`Temp: ${response.daily[i].temp.day} F`);
-                            newHumid.text(`Humidity: ${response.daily[i].humidity} %`);
+                            newTemp.text(`Temp: ${response.daily[i+1].temp.day} F`);
+                            newHumid.text(`Humidity: ${response.daily[i+1].humidity} %`);
                             element.prepend(img);
                             img.attr("src", icon);
                             element.append(newTemp).append(newHumid); 
@@ -103,12 +103,12 @@ $(document).ready(function() {
                     for (let i = 0; i < forecastDays.length; i++) {
                         let element = forecastDays[i];
                             element.empty();       
-                            let icon = "https://openweathermap.org/img/w/" + response.daily[i].weather[0].icon + ".png";
+                            let icon = "https://openweathermap.org/img/w/" + response.daily[i+1].weather[0].icon + ".png";
                             let img = $("<img>");                            
                             let newTemp = $("<p>");
                             let newHumid = $("<p>");
-                            newTemp.text(`Temp: ${response.daily[i].temp.day} F`);
-                            newHumid.text(`Humidity: ${response.daily[i].humidity} %`);
+                            newTemp.text(`Temp: ${response.daily[i+1].temp.day} F`);
+                            newHumid.text(`Humidity: ${response.daily[i+1].humidity} %`);
                             element.prepend(img);
                             img.attr("src", icon);
                             element.append(newTemp).append(newHumid); 
@@ -118,6 +118,7 @@ $(document).ready(function() {
         };
     };
     searchBtn.on("click", getWeather);
+
     $("li").on("click", function() {
         let _this = $(this);
         $.get(`${geoCode}&q=${_this.data("name")},${_this.data("state")},us`).then((response) => {
@@ -140,12 +141,12 @@ $(document).ready(function() {
                 for (let i = 0; i < forecastDays.length; i++) {
                     let element = forecastDays[i];
                         element.empty();       
-                        let icon = "https://openweathermap.org/img/w/" + response.daily[i].weather[0].icon + ".png";
+                        let icon = "https://openweathermap.org/img/w/" + response.daily[i+1].weather[0].icon + ".png";
                         let img = $("<img>");                            
                         let newTemp = $("<p>");
                         let newHumid = $("<p>");
-                        newTemp.text(`Temp: ${response.daily[i].temp.day} F`);
-                        newHumid.text(`Humidity: ${response.daily[i].humidity} %`);
+                        newTemp.text(`Temp: ${response.daily[i+1].temp.day} F`);
+                        newHumid.text(`Humidity: ${response.daily[i+1].humidity} %`);
                         element.prepend(img);
                         img.attr("src", icon);
                         element.append(newTemp).append(newHumid); 
