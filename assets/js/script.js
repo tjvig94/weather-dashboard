@@ -4,7 +4,7 @@ $(document).ready(function() {
     let city = $(".city");
     let state = $(".state");
     let weatherURL = "https://api.openweathermap.org/data/2.5/onecall?appid=fab861540adeaacaf58d87add689e290&units=imperial&exclude=minutely,hourly,alerts"
-    let geoCode = `http://api.openweathermap.org/geo/1.0/direct?appid=fab861540adeaacaf58d87add689e290&limit=1`
+    let geoCode = `https://api.openweathermap.org/geo/1.0/direct?appid=fab861540adeaacaf58d87add689e290&limit=1`
     let forecastDays = [
         $(".day1"), $(".day2"), $(".day3"),  $(".day4"), $(".day5")
     ]
