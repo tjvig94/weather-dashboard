@@ -11,3 +11,12 @@ li.list-group-item:hover {
 li.list-group-item:active {
     background-color:antiquewhite;
 }
+
+h3 {
+    font-size: 20px;
+}
+
+p.current-uv {
+    color: white;
+    width: 120px;
+}

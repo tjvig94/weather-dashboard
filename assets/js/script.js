@@ -43,8 +43,6 @@ $(document).ready(function() {
                 // use lat and lon values to search for that location's weather data
                 $.get(`${weatherURL}&lat=${lat}&lon=${lon}`).then((response) => {
 
-                    console.log(response);
-
                     currentDate(response);
 
                     // Current conditions
@@ -52,6 +50,14 @@ $(document).ready(function() {
                     $("p.current-humidity").text(`Humidity: ${response.current.humidity}%`);
                     $("p.current-wind").text(`Wind Speed: ${response.current.wind_speed} mph`);
                     $("p.current-uv").text(`UV Index: ${response.current.uvi}`);
+
+                    if (response.current.uvi < 3) {
+                        $("p.current-uv").css("background-color", "green");
+                    } else if (response.current.uvi >= 3 && response.current.uvi < 6) {
+                        $("p.current-uv").css("background-color", "orange");
+                    } else if (response.current.uv >= 6) {
+                        $("p.current-uv").css("background-color", "orange");
+                    };
                     // Prepend icon for current conditons
                     let currentIcon = "https://openweathermap.org/img/w/" + response.current.weather[0].icon + ".png";
                     $("img.current-icon").attr("src", currentIcon);
@@ -92,36 +98,39 @@ $(document).ready(function() {
         if (city.val() !== "") {
             // Get latitude and longitude values for API weather query
             $.get(`${geoCode}&q=${city.val()},${state.val()},us`).then((response) => {
-                console.log(response);
                 let lat = response[0].lat;
                 let lon = response[0].lon;
                 let name = response[0].name;
                 let state = response[0].state;
                 $(".city-name").text(response[0].name);
 
+                // Save the searched city to local storage 
                 let newCity = {
                     "name": name,
-                    "state": state,
-                    "lat": lat,
-                    "lon": lon
+                    "state": state
                 };
-
                 (cityHistory == null) ? cityHistory = [] : "";
-                cityHistory.push(newCity);
+                (JSON.stringify(cityHistory).includes(JSON.stringify(newCity))) ? "" : cityHistory.push(newCity);
                 localStorage.setItem("cities", JSON.stringify(cityHistory));
-                let cityLi = $("<li class='list-group-item'>");
-                cityLi.text(`${name}, ${state}`);
-                $("ul.search-history").prepend(cityLi);
 
                 // use lat and lon values to search for that location's weather data
                 $.get(`${weatherURL}&lat=${lat}&lon=${lon}`).then((response) => {
-                    console.log(response);
 
                     // Current conditions
                     $("p.current-temp").text(`Temperature: ${response.current.temp} F`);
                     $("p.current-humidity").text(`Humidity: ${response.current.humidity}%`);
                     $("p.current-wind").text(`Wind Speed: ${response.current.wind_speed} mph`);
                     $("p.current-uv").text(`UV Index: ${response.current.uvi}`);
+
+                    // Change color of UV paragraph depending on severity of UV exposure
+                    if (response.current.uvi < 3) {
+                        $("p.current-uv").css("background-color", "green");
+                    } else if (response.current.uvi >= 3 && response.current.uvi < 6) {
+                        $("p.current-uv").css("background-color", "orange");
+                    } else if (response.current.uv >= 6) {
+                        $("p.current-uv").css("background-color", "orange");
+                    };
+
                     // Prepend icon for current conditons
                     let currentIcon = "https://openweathermap.org/img/w/" + response.current.weather[0].icon + ".png";
                     $(".current-icon").attr("src", currentIcon);
@@ -171,6 +180,14 @@ $(document).ready(function() {
                 $("p.current-humidity").text(`Humidity: ${response.current.humidity}%`);
                 $("p.current-wind").text(`Wind Speed: ${response.current.wind_speed} mph`);
                 $("p.current-uv").text(`UV Index: ${response.current.uvi}`);
+
+                if (response.current.uvi < 3) {
+                    $("p.current-uv").css("background-color", "green");
+                } else if (response.current.uvi >= 3 && response.current.uvi < 6) {
+                    $("p.current-uv").css("background-color", "orange");
+                } else if (response.current.uv >= 6) {
+                    $("p.current-uv").css("background-color", "orange");
+                };
                 // Prepend icon for current conditons
                 let currentIcon = "https://openweathermap.org/img/w/" + response.current.weather[0].icon + ".png";
                 $("img.current-icon").attr("src", currentIcon);
@@ -188,7 +205,7 @@ $(document).ready(function() {
                         element.prepend(img);
                         img.attr("src", icon);
                         element.append(newTemp).append(newHumid); 
-
+                        // Add dates 
                         let unixTimeStamp = response.daily[i+1].dt;
                         let milliseconds = unixTimeStamp *1000;
                         let dateObject = new Date(milliseconds);
@@ -202,4 +219,5 @@ $(document).ready(function() {
             });
         });       
     });
+    console.log(JSON.stringify(cityHistory));
 })
