@@ -22,10 +22,19 @@ $(document).ready(function() {
         });
     };
 
+    function currentDate(response) {
+        let unixTimeStamp = response.current.dt;
+        let milliseconds = unixTimeStamp * 1000;
+        let dateObject = new Date(milliseconds);
+        let currentDay = dateObject.toLocaleString("en-US", {weekday: "long"});
+        let currentMonth = dateObject.toLocaleString("en-US", {month: "long"});
+        let currentDate = dateObject.toLocaleString("en-US", {day: "numeric"});
+        $("h2.current-day").text(`${currentDay}, ${currentMonth} ${currentDate}`);
+    }
+
     function init() {
         if (cityHistory !== null) {
             let recentCity = cityHistory[cityHistory.length-1];
-            console.log(recentCity);
             $.get(`${geoCode}&q=${recentCity.name},${recentCity.state},us`).then((response) => {
                 let lat = response[0].lat;
                 let lon = response[0].lon;
@@ -33,6 +42,11 @@ $(document).ready(function() {
 
                 // use lat and lon values to search for that location's weather data
                 $.get(`${weatherURL}&lat=${lat}&lon=${lon}`).then((response) => {
+
+                    console.log(response);
+
+                    currentDate(response);
+
                     // Current conditions
                     $("p.current-temp").text(`Temperature: ${response.current.temp} F`);
                     $("p.current-humidity").text(`Humidity: ${response.current.humidity}%`);
@@ -55,6 +69,16 @@ $(document).ready(function() {
                             element.prepend(img);
                             img.attr("src", icon);
                             element.append(newTemp).append(newHumid); 
+
+                            let unixTimeStamp = response.daily[i+1].dt;
+                            let milliseconds = unixTimeStamp *1000;
+                            let dateObject = new Date(milliseconds);
+                            let currentDay = dateObject.toLocaleString("en-US", {weekday: "long"});
+                            let currentMonth = dateObject.toLocaleString("en-US", {month: "long"});
+                            let currentDate = dateObject.toLocaleString("en-US", {day: "numeric"});
+                            let dateHead = $("<h3>");
+                            dateHead.text(`${currentDay}, ${currentMonth} ${currentDate}`);
+                            element.prepend(dateHead);
                     };
                 });
             });            
@@ -85,6 +109,9 @@ $(document).ready(function() {
                 (cityHistory == null) ? cityHistory = [] : "";
                 cityHistory.push(newCity);
                 localStorage.setItem("cities", JSON.stringify(cityHistory));
+                let cityLi = $("<li class='list-group-item'>");
+                cityLi.text(`${name}, ${state}`);
+                $("ul.search-history").prepend(cityLi);
 
                 // use lat and lon values to search for that location's weather data
                 $.get(`${weatherURL}&lat=${lat}&lon=${lon}`).then((response) => {
@@ -111,12 +138,23 @@ $(document).ready(function() {
                             newHumid.text(`Humidity: ${response.daily[i+1].humidity} %`);
                             element.prepend(img);
                             img.attr("src", icon);
-                            element.append(newTemp).append(newHumid); 
+                            element.append(newTemp).append(newHumid);
+                            // Add dates 
+                            let unixTimeStamp = response.daily[i+1].dt;
+                            let milliseconds = unixTimeStamp *1000;
+                            let dateObject = new Date(milliseconds);
+                            let currentDay = dateObject.toLocaleString("en-US", {weekday: "long"});
+                            let currentMonth = dateObject.toLocaleString("en-US", {month: "long"});
+                            let currentDate = dateObject.toLocaleString("en-US", {day: "numeric"});
+                            let dateHead = $("<h3>");
+                            dateHead.text(`${currentDay}, ${currentMonth} ${currentDate}`);
+                            element.prepend(dateHead); 
                     };
                 });
             });
         };
     };
+
     searchBtn.on("click", getWeather);
 
     $("li").on("click", function() {
@@ -150,6 +188,16 @@ $(document).ready(function() {
                         element.prepend(img);
                         img.attr("src", icon);
                         element.append(newTemp).append(newHumid); 
+
+                        let unixTimeStamp = response.daily[i+1].dt;
+                        let milliseconds = unixTimeStamp *1000;
+                        let dateObject = new Date(milliseconds);
+                        let currentDay = dateObject.toLocaleString("en-US", {weekday: "long"});
+                        let currentMonth = dateObject.toLocaleString("en-US", {month: "long"});
+                        let currentDate = dateObject.toLocaleString("en-US", {day: "numeric"});
+                        let dateHead = $("<h3>");
+                        dateHead.text(`${currentDay}, ${currentMonth} ${currentDate}`);
+                        element.prepend(dateHead); 
                 };
             });
         });       
