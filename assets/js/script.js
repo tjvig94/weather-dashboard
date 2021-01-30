@@ -12,7 +12,7 @@ $(document).ready(function() {
     let cityHistory = JSON.parse(localStorage.getItem("cities"));
 
     function listCities() {
-        (cityHistory == null) ? cityHistory = [] : "";
+        (cityHistory == null) ? cityHistory = [] : $("ul.search-history").empty();
         cityHistory.forEach(element => {
             let cityBtn = $("<li class='list-group-item'>");
             cityBtn.text(`${element.name}, ${element.state}`);
@@ -42,7 +42,7 @@ $(document).ready(function() {
 
                 // use lat and lon values to search for that location's weather data
                 $.get(`${weatherURL}&lat=${lat}&lon=${lon}`).then((response) => {
-
+                    // Place current date in the header
                     currentDate(response);
 
                     // Current conditions
@@ -50,7 +50,7 @@ $(document).ready(function() {
                     $("p.current-humidity").text(`Humidity: ${response.current.humidity}%`);
                     $("p.current-wind").text(`Wind Speed: ${response.current.wind_speed} mph`);
                     $("p.current-uv").text(`UV Index: ${response.current.uvi}`);
-
+                    // Change color of UV text background depending on severity
                     if (response.current.uvi < 3) {
                         $("p.current-uv").css("background-color", "green");
                     } else if (response.current.uvi >= 3 && response.current.uvi < 6) {
@@ -116,6 +116,8 @@ $(document).ready(function() {
                 // use lat and lon values to search for that location's weather data
                 $.get(`${weatherURL}&lat=${lat}&lon=${lon}`).then((response) => {
 
+                    currentDate(response);
+
                     // Current conditions
                     $("p.current-temp").text(`Temperature: ${response.current.temp} F`);
                     $("p.current-humidity").text(`Humidity: ${response.current.humidity}%`);
@@ -134,6 +136,16 @@ $(document).ready(function() {
                     // Prepend icon for current conditons
                     let currentIcon = "https://openweathermap.org/img/w/" + response.current.weather[0].icon + ".png";
                     $(".current-icon").attr("src", currentIcon);
+                    
+                    // Add new city to search history list only if it does not already exist
+                    if (JSON.stringify(cityHistory).includes(JSON.stringify(newCity)) == false) {
+                        let cityBtn = $("<li class='list-group-item'>");
+                        cityBtn.text(`${name}, ${state}`);
+                        cityBtn.attr("data-name", `${name}`);
+                        cityBtn.attr("data-state", `${state}`);
+                        $("ul").prepend(cityBtn);
+                    };   
+
 
                     // 5 Day Forecast
                     for (let i = 0; i < forecastDays.length; i++) {
